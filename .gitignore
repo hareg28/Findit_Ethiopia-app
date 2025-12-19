@@ -43,4 +43,4 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
-"oracleJdk-25/lib/modules" 
+oracleJdk-25/lib/modules
