@@ -3,8 +3,10 @@ import 'package:geolocator/geolocator.dart';
 import '../models/category_item.dart';
 import '../models/product_item.dart';
 import '../widgets/product_card.dart';
-import '../services/auth_service.dart';
+import 'package:provider/provider.dart';
+import '../controllers/auth_controller.dart';
 import '../services/location_service.dart';
+import '../services/database_service.dart';
 import 'product_detail_screen.dart';
 import 'vendor_home_screen.dart';
 import 'login_screen.dart';
@@ -20,6 +22,7 @@ class MainHomeScreen extends StatefulWidget {
 
 class _MainHomeScreenState extends State<MainHomeScreen> {
   final TextEditingController _searchController = TextEditingController();
+  final DatabaseService _databaseService = DatabaseService();
   int _selectedIndex = 0;
   String _selectedCategory = 'All';
   Position? _currentPosition;
@@ -36,97 +39,6 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
     CategoryItem(name: 'Food', icon: Icons.restaurant, color: Colors.red),
   ];
 
-  // Sample products with shop locations (Addis Ababa coordinates)
-  final List<ProductItem> _allProducts = [
-    ProductItem(
-      name: 'Cement (Dangote 50kg)',
-      category: 'Construction',
-      price: 780,
-      distanceKm: 1.2, // Will be calculated dynamically
-      shopName: 'Addis Construction Supply',
-      inStock: true,
-      shopLatitude: 9.0191,
-      shopLongitude: 38.7556,
-      shopAddress: 'Bole Road, Addis Ababa',
-    ),
-    ProductItem(
-      name: '32" LED TV',
-      category: 'Electronics',
-      price: 8500,
-      distanceKm: 3.5, // Will be calculated dynamically
-      shopName: 'Merkato Electronics',
-      inStock: true,
-      shopLatitude: 9.0273,
-      shopLongitude: 38.7569,
-      shopAddress: 'Merkato, Addis Ababa',
-    ),
-    ProductItem(
-      name: 'A4 Paper (500 sheets)',
-      category: 'Stationery',
-      price: 420,
-      distanceKm: 0.8, // Will be calculated dynamically
-      shopName: 'Piassa Stationery',
-      inStock: true,
-      shopLatitude: 9.0323,
-      shopLongitude: 38.7494,
-      shopAddress: 'Piassa, Addis Ababa',
-    ),
-    ProductItem(
-      name: 'Steel Rebar 12mm',
-      category: 'Construction',
-      price: 550,
-      distanceKm: 2.1, // Will be calculated dynamically
-      shopName: 'Bole Hardware Store',
-      inStock: true,
-      shopLatitude: 9.0122,
-      shopLongitude: 38.7899,
-      shopAddress: 'Bole Sub-city, Addis Ababa',
-    ),
-    ProductItem(
-      name: 'Laptop Stand',
-      category: 'Electronics',
-      price: 1200,
-      distanceKm: 4.2, // Will be calculated dynamically
-      shopName: 'Tech Hub Addis',
-      inStock: false,
-      shopLatitude: 9.0054,
-      shopLongitude: 38.7636,
-      shopAddress: 'Mexico, Addis Ababa',
-    ),
-    ProductItem(
-      name: 'Office Chair',
-      category: 'Furniture',
-      price: 3500,
-      distanceKm: 2.8, // Will be calculated dynamically
-      shopName: 'Comfort Furniture',
-      inStock: true,
-      shopLatitude: 9.0089,
-      shopLongitude: 38.7778,
-      shopAddress: 'Cazanchise, Addis Ababa',
-    ),
-    ProductItem(
-      name: 'Kitchen Set',
-      category: 'Household',
-      price: 2500,
-      distanceKm: 1.5, // Will be calculated dynamically
-      shopName: 'Home Essentials',
-      inStock: true,
-      shopLatitude: 9.0147,
-      shopLongitude: 38.7524,
-      shopAddress: 'Kazanches, Addis Ababa',
-    ),
-    ProductItem(
-      name: 'Notebooks (Pack of 10)',
-      category: 'Stationery',
-      price: 180,
-      distanceKm: 0.5, // Will be calculated dynamically
-      shopName: 'School Supplies Co.',
-      inStock: true,
-      shopLatitude: 9.0181,
-      shopLongitude: 38.7481,
-      shopAddress: 'Arada, Addis Ababa',
-    ),
-  ];
 
   @override
   void initState() {
@@ -146,8 +58,6 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
         _currentPosition = position;
         _isLoadingLocation = false;
       });
-      // Recalculate distances for all products
-      _updateProductDistances();
     } else {
       setState(() {
         _isLoadingLocation = false;
@@ -164,44 +74,8 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
     }
   }
 
-  void _updateProductDistances() {
-    if (_currentPosition == null) return;
-
-    setState(() {
-      for (int i = 0; i < _allProducts.length; i++) {
-        final product = _allProducts[i];
-        if (product.shopLatitude != null && product.shopLongitude != null) {
-          final distance = LocationService.calculateDistance(
-            _currentPosition!.latitude,
-            _currentPosition!.longitude,
-            product.shopLatitude!,
-            product.shopLongitude!,
-          );
-          // Update the distance in the product
-          _allProducts[i] = product.copyWith(distanceKm: distance);
-        }
-      }
-    });
-  }
-
-  List<ProductItem> get _filteredProducts {
-    var filtered = List<ProductItem>.from(_allProducts);
-    
-    // Recalculate distances if we have current position
-    if (_currentPosition != null) {
-      filtered = filtered.map((product) {
-        if (product.shopLatitude != null && product.shopLongitude != null) {
-          final distance = LocationService.calculateDistance(
-            _currentPosition!.latitude,
-            _currentPosition!.longitude,
-            product.shopLatitude!,
-            product.shopLongitude!,
-          );
-          return product.copyWith(distanceKm: distance);
-        }
-        return product;
-      }).toList();
-    }
+  List<ProductItem> _filterProducts(List<ProductItem> products) {
+    var filtered = List<ProductItem>.from(products);
     
     if (_selectedCategory != 'All') {
       filtered = filtered.where((p) => p.category == _selectedCategory).toList();
@@ -213,7 +87,7 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
             p.shopName.toLowerCase().contains(query);
       }).toList();
     }
-    // Sort by distance
+    // Sort by distance (already sorted by database service, but ensure it)
     filtered.sort((a, b) => a.distanceKm.compareTo(b.distanceKm));
     return filtered;
   }
@@ -441,21 +315,64 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
         const SizedBox(height: 16),
         // Products list
         Expanded(
-          child: _filteredProducts.isEmpty
-              ? const Center(
+          child: StreamBuilder<List<ProductItem>>(
+            stream: _databaseService.getProductsStream(
+              category: _selectedCategory == 'All' ? null : _selectedCategory,
+              searchQuery: _searchController.text.isEmpty ? null : _searchController.text,
+              userLatitude: _currentPosition?.latitude,
+              userLongitude: _currentPosition?.longitude,
+            ),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              
+              if (snapshot.hasError) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.error_outline, size: 64, color: Colors.red),
+                      const SizedBox(height: 16),
+                      Text('Error: ${snapshot.error}'),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: () => setState(() {}),
+                        child: const Text('Retry'),
+                      ),
+                    ],
+                  ),
+                );
+              }
+
+              final products = snapshot.data ?? [];
+              final filteredProducts = _filterProducts(products);
+
+              if (filteredProducts.isEmpty) {
+                return const Center(
                   child: Text('No items found. Try a different search.'),
-                )
-              : ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  itemCount: _filteredProducts.length,
-                  itemBuilder: (context, index) {
-                    final product = _filteredProducts[index];
-                    return ProductCard(
-                      product: product,
-                      onTap: () {},
-                    );
-                  },
-                ),
+                );
+              }
+
+              return ListView.builder(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                itemCount: filteredProducts.length,
+                itemBuilder: (context, index) {
+                  final product = filteredProducts[index];
+                  return ProductCard(
+                    product: product,
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => ProductDetailScreen(product: product),
+                        ),
+                      );
+                    },
+                  );
+                },
+              );
+            },
+          ),
         ),
       ],
     );
@@ -531,30 +448,51 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
                       ),
                     ),
                     Expanded(
-                      child: ListView.builder(
-                        controller: scrollController,
-                        itemCount: _filteredProducts.length,
-                        itemBuilder: (context, index) {
-                          final product = _filteredProducts[index];
-                          return ListTile(
-                            leading: CircleAvatar(
-                              backgroundColor: Colors.green.shade100,
-                              child: Icon(Icons.store, color: Colors.green.shade700),
-                            ),
-                            title: Text(product.shopName),
-                            subtitle: Text('${product.distanceKm.toStringAsFixed(1)} km away'),
-                            trailing: Text(
-                              '${product.price.toStringAsFixed(0)} ETB',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.green,
-                              ),
-                            ),
-                            onTap: () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (_) => ProductDetailScreen(product: product),
+                      child: StreamBuilder<List<ProductItem>>(
+                        stream: _databaseService.getProductsStream(
+                          userLatitude: _currentPosition?.latitude,
+                          userLongitude: _currentPosition?.longitude,
+                        ),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return const Center(child: CircularProgressIndicator());
+                          }
+                          
+                          if (snapshot.hasError) {
+                            return Center(
+                              child: Text('Error: ${snapshot.error}'),
+                            );
+                          }
+
+                          final products = snapshot.data ?? [];
+                          final filteredProducts = _filterProducts(products);
+
+                          return ListView.builder(
+                            controller: scrollController,
+                            itemCount: filteredProducts.length,
+                            itemBuilder: (context, index) {
+                              final product = filteredProducts[index];
+                              return ListTile(
+                                leading: CircleAvatar(
+                                  backgroundColor: Colors.green.shade100,
+                                  child: Icon(Icons.store, color: Colors.green.shade700),
                                 ),
+                                title: Text(product.shopName),
+                                subtitle: Text('${product.distanceKm.toStringAsFixed(1)} km away'),
+                                trailing: Text(
+                                  '${product.price.toStringAsFixed(0)} ETB',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.green,
+                                  ),
+                                ),
+                                onTap: () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (_) => ProductDetailScreen(product: product),
+                                    ),
+                                  );
+                                },
                               );
                             },
                           );
@@ -601,13 +539,20 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
         backgroundColor: Colors.green,
         foregroundColor: Colors.white,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () {
-              AuthService.logout();
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (_) => const LoginScreen()),
-                (route) => false,
+          Consumer<AuthController>(
+            builder: (context, authController, _) {
+              return IconButton(
+                icon: const Icon(Icons.logout),
+                onPressed: authController.isLoading
+                    ? null
+                    : () async {
+                        await authController.signOut();
+                        if (!mounted) return;
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(builder: (_) => const LoginScreen()),
+                          (route) => false,
+                        );
+                      },
               );
             },
           ),

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 import '../models/product_item.dart';
 import '../services/location_service.dart';
 import 'main_home_screen.dart';
@@ -14,7 +13,6 @@ class ProductDetailScreen extends StatefulWidget {
 }
 
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
-  Position? _currentPosition;
   double? _calculatedDistance;
   bool _isLoadingLocation = false;
 
@@ -40,7 +38,6 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     
     if (position != null) {
       setState(() {
-        _currentPosition = position;
         _calculatedDistance = LocationService.calculateDistance(
           position.latitude,
           position.longitude,

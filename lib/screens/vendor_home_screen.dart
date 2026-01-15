@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 import '../models/inventory_item.dart';
 import '../services/location_service.dart';
 

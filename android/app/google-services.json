@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1066462249856",
+    "project_id": "findit-ethiopia",
+    "storage_bucket": "findit-ethiopia.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1066462249856:android:9730e5e64301ba3337b765",
+        "android_client_info": {
+          "package_name": "com.example.findit_ethiopia"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1066462249856-6ioi6fv43a9et4hejp4mrqpmv9146qvi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDNwvcH5X_YwBvNQzCuHZHH8Ksh6mM15BE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1066462249856-6ioi6fv43a9et4hejp4mrqpmv9146qvi.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
