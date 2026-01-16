@@ -54,10 +54,8 @@ plugins {
 
 android {
     namespace = "com.example.findit_ethiopia"
-    compileSdk = flutter.compileSdkVersion
-
-    // Explicitly set NDK version to avoid mismatches
-    ndkVersion = "27.3.13750724"
+    compileSdk = 36
+    // Let Flutter manage the NDK version
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -71,7 +69,7 @@ android {
     defaultConfig {
         applicationId = "com.example.findit_ethiopia"
         minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
+        targetSdk = 36
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
@@ -81,14 +79,9 @@ android {
             // TODO: Replace with your own signing config for production
             signingConfig = signingConfigs.getByName("debug")
 
-            // ✅ Kotlin DSL requires assignment form
-            isMinifyEnabled = true
-            isShrinkResources = true
-
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
+            // Disabled for faster builds during development/testing
+            isMinifyEnabled = false
+            isShrinkResources = false
         }
         debug {
             signingConfig = signingConfigs.getByName("debug")

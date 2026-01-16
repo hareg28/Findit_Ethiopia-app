@@ -91,8 +91,13 @@ class AuthController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void _setError(String error) {
-    _errorMessage = error;
+  void _setError(dynamic error) {
+    debugPrint('ANTIGRAVITY_ERROR TYPE: ${error.runtimeType}');
+    debugPrint('ANTIGRAVITY_ERROR TOSTRING: $error');
+    if (error is Error) {
+       debugPrint('ANTIGRAVITY_ERROR STACK: ${error.stackTrace}');
+    }
+    _errorMessage = 'Error: $error';
     notifyListeners();
   }
 

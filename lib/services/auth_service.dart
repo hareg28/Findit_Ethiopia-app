@@ -142,6 +142,8 @@ class AuthService {
         return 'Too many requests. Please try again later.';
       case 'operation-not-allowed':
         return 'This operation is not allowed.';
+      case 'invalid-credential':
+        return 'Invalid email or password.';
       default:
         return e.message ?? 'An authentication error occurred.';
     }

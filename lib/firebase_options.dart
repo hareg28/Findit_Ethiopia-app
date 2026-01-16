@@ -1,13 +1,12 @@
-// GENERATED FILE - Template for Firebase configuration
-// Replace the placeholder values with those from your Firebase project
-// or run `flutterfire configure` to generate a verified file.
-
 import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
 import 'package:flutter/foundation.dart'
-    show defaultTargetPlatform, TargetPlatform;
+    show defaultTargetPlatform, kIsWeb, TargetPlatform;
 
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
+    if (kIsWeb) {
+      return web;
+    }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return android;
@@ -19,50 +18,44 @@ class DefaultFirebaseOptions {
       case TargetPlatform.linux:
         return desktop;
       default:
-        return web;
+        return web; // Fallback to web for others
     }
   }
 
   // Web configuration
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'YOUR_WEB_API_KEY',
-    authDomain: 'YOUR_PROJECT.firebaseapp.com',
-    projectId: 'YOUR_PROJECT_ID',
-    storageBucket: 'YOUR_PROJECT.appspot.com',
-    messagingSenderId: 'YOUR_SENDER_ID',
-    appId: '1:YOUR_SENDER_ID:web:YOUR_WEB_APP_ID',
-    measurementId: 'G-MEASUREMENT_ID',
+    apiKey: 'AIzaSyAZBR0tS6UMXqVpSdoJ4eQhrbB1V_X0IU8',
+    appId: '1:1066462249856:web:eb66168d096dab6737b765',
+    messagingSenderId: '1066462249856',
+    projectId: 'findit-ethiopia',
+    authDomain: 'findit-ethiopia.firebaseapp.com',
+    storageBucket: 'findit-ethiopia.firebasestorage.app',
+    measurementId: 'G-WHJQVRTXJ5',
   );
 
   // Android configuration
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'YOUR_ANDROID_API_KEY',
-    appId: '1:YOUR_SENDER_ID:android:YOUR_ANDROID_APP_ID',
-    messagingSenderId: 'YOUR_SENDER_ID',
-    projectId: 'YOUR_PROJECT_ID',
-    storageBucket: 'YOUR_PROJECT.appspot.com',
+    apiKey: 'AIzaSyDNwvcH5X_YwBvNQzCuHZHH8Ksh6mM15BE',
+    appId: '1:1066462249856:android:9730e5e64301ba3337b765',
+    messagingSenderId: '1066462249856',
+    projectId: 'findit-ethiopia',
+    storageBucket: 'findit-ethiopia.firebasestorage.app',
   );
 
-  // iOS configuration
+  // iOS configuration (Using Android project info as placeholder baseline)
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'YOUR_IOS_API_KEY',
-    appId: '1:YOUR_SENDER_ID:ios:YOUR_IOS_APP_ID',
-    messagingSenderId: 'YOUR_SENDER_ID',
-    projectId: 'YOUR_PROJECT_ID',
-    storageBucket: 'YOUR_PROJECT.appspot.com',
-    iosClientId: 'YOUR_IOS_CLIENT_ID',
-    iosBundleId: 'YOUR_IOS_BUNDLE_ID',
+    apiKey: 'AIzaSyDNwvcH5X_YwBvNQzCuHZHH8Ksh6mM15BE',
+    appId: '1:1066462249856:ios:eb66168d096dab6737b765',
+    messagingSenderId: '1066462249856',
+    projectId: 'findit-ethiopia',
+    storageBucket: 'findit-ethiopia.firebasestorage.app',
+    iosClientId: '1066462249856-6ioi6fv43a9et4hejp4mrqpmv9146qvi.apps.googleusercontent.com',
+    iosBundleId: 'com.example.finditEthiopia',
   );
 
   // macOS (often same as iOS)
   static const FirebaseOptions macos = ios;
 
   // Desktop placeholder (Windows/Linux)
-  static const FirebaseOptions desktop = FirebaseOptions(
-    apiKey: 'YOUR_DESKTOP_API_KEY',
-    appId: '1:YOUR_SENDER_ID:desktop:YOUR_DESKTOP_APP_ID',
-    messagingSenderId: 'YOUR_SENDER_ID',
-    projectId: 'YOUR_PROJECT_ID',
-    storageBucket: 'YOUR_PROJECT.appspot.com',
-  );
+  static const FirebaseOptions desktop = web; // Just use web config for desktop too
 }
